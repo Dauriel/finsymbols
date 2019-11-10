@@ -84,13 +84,15 @@ def wiki_html(url, file_name):
     python-wikitools - http://code.google.com/p/python-wikitools/
     Ex. http://en.wikipedia.org/w/api.php?format=xml&action=query&titles=List_of_S%26P_500_companies&prop=revisions&rvprop=content
     '''
-    file_path = os.path.join(os.path.dirname(finsymbols.__file__), file_name)
+    file_path = os.path.join(os.path.dirname(finsymbols.finsymbols.__file__), file_name)
 
-    if is_cached(file_path):
-        with open(file_path, "rb") as sp500_file:
-            return sp500_file.read()
-    else:
-        wiki_html = fetch_file('http://en.wikipedia.org/wiki/{}'.format(url))
+    if not is_cached(file_path):
+        wiki_html = str(fetch_file('http://en.wikipedia.org/wiki/{}'.format(url)))
         # Save file to be used by cache
-        save_file(file_path, wiki_html)
-        return wiki_html
+        with open(file_path, "w", encoding="utf-8") as f:
+            for line in wiki_html:
+                f.write(line)
+
+    with open(file_path, "rb") as sp500_file:
+        return sp500_file.read()
+
